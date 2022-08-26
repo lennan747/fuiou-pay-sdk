@@ -1,0 +1,33 @@
+{
+    "name": "lennan747/fuiou-pay-sdk",
+    "version": "1.0.0",
+    "description": "富友支付 API SKD",
+    "homepage": "https://github.com/lennan747",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lennan747",
+            "email": "lennan747@gamil.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "pimple/pimple": "~3.0",
+        "guzzlehttp/guzzle": "~6.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lennan\\Fuiou\\Sdk\\": "src/"
+        }
+    },
+    "extra": {
+        "think": {
+            "config": {
+                "fuiou": "config/config.php"
+            }
+        }
+    }
+}
