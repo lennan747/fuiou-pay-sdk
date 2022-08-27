@@ -2,22 +2,64 @@
 
 namespace Lennan\Fuiou\Sdk;
 
+use Lennan\Foiou\Sdk\Core\Exceptions\InvalidArgumentException;
+
 /**
  * Generate a signature.
  *
- * @param array  $attributes
+ * @param array $attributes
  * @param string $key
  * @param string $encryptMethod
  *
  * @return string
  */
-function generate_sign(array $attributes, $key, $encryptMethod = 'md5')
+function generate_sign(array $attributes, $key, string $encryptMethod = 'md5'): string
 {
     ksort($attributes);
 
-    $attributes['key'] = $key;
+    if ($encryptMethod == 'openssl') {
+        openssl_sign(http_build_query($attributes), $sign, $key, OPENSSL_ALGO_MD5);
+        return base64_encode($sign);
+    }
 
+    $attributes['key'] = $key;
     return strtoupper(call_user_func_array($encryptMethod, [urldecode(http_build_query($attributes))]));
+}
+
+/**
+ * @param $publicKey
+ * @return resource
+ * @throws InvalidArgumentException
+ */
+function get_public_key($publicKey)
+{
+    $publicKey = "-----BEGIN PUBLIC KEY-----\n" .
+        wordwrap($publicKey, 64, "\n", true) .
+        "\n-----END PUBLIC KEY-----";
+    $result = openssl_pkey_get_public($publicKey);
+    if (empty($result)) {
+        throw new InvalidArgumentException('public key error');
+    }
+    return $result;
+
+}
+
+/**
+ * @param $privateKey
+ * @return resource
+ * @throws InvalidArgumentException
+ */
+function get_private_key($privateKey)
+{
+    $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
+        wordwrap($privateKey, 64, "\n", true) .
+        "\n-----END RSA PRIVATE KEY-----";
+    $result = openssl_pkey_get_private($privateKey);
+    if (empty($result)) {
+        throw new InvalidArgumentException('private key error');
+    }
+    return $result;
+
 }
 
 /**

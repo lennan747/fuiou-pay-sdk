@@ -3,7 +3,9 @@
 namespace Lennan\Fuiou\Sdk\Core;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
+use Psr\Http\Message\ResponseInterface;
 
 class Http
 {
@@ -48,7 +50,7 @@ class Http
      *
      * @param array $defaults
      */
-    public static function setDefaultOptions($defaults = [])
+    public static function setDefaultOptions(array $defaults = [])
     {
         self::$defaults = array_merge(self::$globals, $defaults);
     }
@@ -58,41 +60,33 @@ class Http
      *
      * @return array
      */
-    public static function getDefaultOptions()
+    public static function getDefaultOptions(): array
     {
         return self::$defaults;
     }
 
     /**
-     * Make a request.
-     *
-     * @param string $url
+     * @param $url
      * @param string $method
      * @param array $options
-     *
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws GuzzleException
      */
-    public function request($url, $method = 'GET', $options = [])
+    public function request($url, string $method = 'GET', array $options = [])
     {
         $method = strtoupper($method);
 
         $options = array_merge(self::$defaults, $options);
 
-        $options['handler'] = $this->getHandler();
+        //$options['handler'] = $this->getHandler();
 
-        $response = $this->getClient()->request($method, $url, $options);
-
-        return $response;
+        return $this->getClient()->request($method, $url, $options);
     }
 
     /**
-     * Return GuzzleHttp\Client instance.
-     *
-     * @return \GuzzleHttp\Client
+     * @return HttpClient
      */
-    public function getClient()
+    public function getClient(): HttpClient
     {
         if (!($this->client instanceof HttpClient)) {
             $this->client = new HttpClient();
@@ -106,7 +100,7 @@ class Http
      *
      * @return HandlerStack
      */
-    protected function getHandler()
+    protected function getHandler(): HandlerStack
     {
         $stack = HandlerStack::create();
 
@@ -119,5 +113,20 @@ class Http
         }
 
         return $stack;
+    }
+
+    /**
+     * @param $url
+     * @param array $options
+     * @param int $encodeOption
+     * @param array $queries
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
+    public function json($url, array $options = [], int $encodeOption = JSON_UNESCAPED_UNICODE, array $queries = [])
+    {
+        is_array($options) && $options = json_encode($options, $encodeOption);
+
+        return $this->request($url, 'POST', ['query' => $queries, 'body' => $options, 'headers' => ['content-type' => 'application/json']]);
     }
 }

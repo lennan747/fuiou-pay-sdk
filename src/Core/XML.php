@@ -27,21 +27,16 @@ class XML
     /**
      * XML encode.
      *
-     * @param mixed  $data
-     * @param string $root
-     * @param string $item
-     * @param string $attr
-     * @param string $id
+     * @param mixed $data
+     * @param mixed $root
+     * @param mixed $item
+     * @param mixed $attr
+     * @param mixed $id
      *
      * @return string
      */
-    public static function build(
-        $data,
-        $root = 'xml',
-        $item = 'item',
-        $attr = '',
-        $id = 'id'
-    ) {
+    public static function build($data, $root = 'xml', $item = 'item', $attr = '', $id = 'id'): string
+    {
         if (is_array($attr)) {
             $_attr = [];
 
@@ -55,8 +50,9 @@ class XML
         $attr = trim($attr);
         $attr = empty($attr) ? '' : " {$attr}";
         $xml = "<{$root}{$attr}>";
+        $xml .= "<xml>";
         $xml .= self::data2Xml($data, $item, $id);
-        $xml .= "</{$root}>";
+        $xml .= "<xml>";
 
         return $xml;
     }
@@ -86,7 +82,7 @@ class XML
         $result = null;
 
         if (is_object($obj)) {
-            $obj = (array) $obj;
+            $obj = (array)$obj;
         }
 
         if (is_array($obj)) {
@@ -108,13 +104,13 @@ class XML
     /**
      * Array to XML.
      *
-     * @param array  $data
-     * @param string $item
-     * @param string $id
+     * @param mixed $data
+     * @param mixed $item
+     * @param mixed $id
      *
      * @return string
      */
-    protected static function data2Xml($data, $item = 'item', $id = 'id')
+    protected static function data2Xml($data, $item = 'item', $id = 'id'): string
     {
         $xml = $attr = '';
 
@@ -127,9 +123,10 @@ class XML
             $xml .= "<{$key}{$attr}>";
 
             if ((is_array($val) || is_object($val))) {
-                $xml .= self::data2Xml((array) $val, $item, $id);
+                $xml .= self::data2Xml((array)$val, $item, $id);
             } else {
-                $xml .= is_numeric($val) ? $val : self::cdata($val);
+                $xml .= $val;
+//                $xml .= is_numeric($val) ? $val : self::cdata($val);
             }
 
             $xml .= "</{$key}>";

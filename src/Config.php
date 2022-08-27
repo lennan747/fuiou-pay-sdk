@@ -7,6 +7,7 @@ use ArrayIterator;
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
+use Lennan\Fuiou\Sdk\Core\Arr;
 use Serializable;
 use Traversable;
 

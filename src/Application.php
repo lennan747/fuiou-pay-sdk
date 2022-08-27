@@ -5,7 +5,7 @@ namespace Lennan\Fuiou\Sdk;
 use Pimple\Container;
 
 /**
- *
+ * @property \Lennan\Fuiou\Sdk\Aggregate\Aggregate $aggregate
  */
 class Application extends Container
 {
@@ -23,9 +23,7 @@ class Application extends Container
     {
         parent::__construct();
 
-        $this['config'] = function () use ($config) {
-            return new Config($config);
-        };
+        $this['config'] = new Config($config);
 
         $this->registerProviders();
 
