@@ -3,7 +3,6 @@
 namespace Lennan\Fuiou\Sdk\Core;
 
 use GuzzleHttp\Client as HttpClient;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use Psr\Http\Message\ResponseInterface;
 use Lennan\Foiou\Sdk\Core\Exceptions\HttpException;
@@ -51,7 +50,7 @@ class Http
      *
      * @param array $defaults
      */
-    public static function setDefaultOptions($defaults = [])
+    public static function setDefaultOptions(array $defaults = [])
     {
         self::$defaults = array_merge(self::$globals, $defaults);
     }
@@ -61,7 +60,7 @@ class Http
      *
      * @return array
      */
-    public static function getDefaultOptions()
+    public static function getDefaultOptions(): array
     {
         return self::$defaults;
     }
@@ -76,7 +75,7 @@ class Http
      *
      * @throws HttpException
      */
-    public function get($url, array $options = [])
+    public function get(string $url, array $options = []): ResponseInterface
     {
         return $this->request($url, 'GET', ['query' => $options]);
     }
@@ -91,7 +90,7 @@ class Http
      *
      * @throws HttpException
      */
-    public function post($url, $options = [])
+    public function post($url, $options = []): ResponseInterface
     {
         $key = is_array($options) ? 'form_params' : 'body';
 
@@ -99,18 +98,14 @@ class Http
     }
 
     /**
-     * JSON request.
-     *
-     * @param string       $url
-     * @param string|array $options
-     * @param array        $queries
-     * @param int          $encodeOption
-     *
+     * @param string $url
+     * @param array $options
+     * @param int $encodeOption
+     * @param array $queries
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function json($url, $options = [], $encodeOption = JSON_UNESCAPED_UNICODE, $queries = [])
+    public function json(string $url, array $options = [], int $encodeOption = JSON_UNESCAPED_UNICODE, array $queries = [])
     {
         is_array($options) && $options = json_encode($options, $encodeOption);
 
@@ -121,14 +116,14 @@ class Http
      * Upload file.
      *
      * @param string $url
-     * @param array  $files
-     * @param array  $form
-     *
+     * @param array $files
+     * @param array $form
+     * @param array $queries
      * @return ResponseInterface
      *
      * @throws HttpException
      */
-    public function upload($url, array $files = [], array $form = [], array $queries = [])
+    public function upload(string $url, array $files = [], array $form = [], array $queries = [])
     {
         $multipart = [];
 
@@ -147,13 +142,10 @@ class Http
     }
 
     /**
-     * Set GuzzleHttp\Client.
-     *
-     * @param \GuzzleHttp\Client $client
-     *
-     * @return Http
+     * @param HttpClient $client
+     * @return $this
      */
-    public function setClient(HttpClient $client)
+    public function setClient(HttpClient $client): Http
     {
         $this->client = $client;
 
@@ -161,11 +153,9 @@ class Http
     }
 
     /**
-     * Return GuzzleHttp\Client instance.
-     *
-     * @return \GuzzleHttp\Client
+     * @return HttpClient
      */
-    public function getClient()
+    public function getClient(): HttpClient
     {
         if (!($this->client instanceof HttpClient)) {
             $this->client = new HttpClient();
@@ -181,9 +171,9 @@ class Http
      *
      * @return $this
      */
-    public function addMiddleware(callable $middleware)
+    public function addMiddleware(callable $middleware): Http
     {
-        array_push($this->middlewares, $middleware);
+        $this->middlewares[] = $middleware;
 
         return $this;
     }
@@ -193,23 +183,19 @@ class Http
      *
      * @return array
      */
-    public function getMiddlewares()
+    public function getMiddlewares(): array
     {
         return $this->middlewares;
     }
 
     /**
-     * Make a request.
-     *
-     * @param string $url
+     * @param $url
      * @param string $method
-     * @param array  $options
-     *
+     * @param array $options
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($url, $method = 'GET', $options = [])
+    public function request($url, string $method = 'GET', array $options = []): ResponseInterface
     {
         $method = strtoupper($method);
 
@@ -217,16 +203,13 @@ class Http
 
         $options['handler'] = $this->getHandler();
 
-        $response = $this->getClient()->request($method, $url, $options);
-
-        return $response;
+        return $this->getClient()->request($method, $url, $options);
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface|string $body
-     *
-     * @return mixed
-     *
+     * @param $body
+     * @return false|mixed
+     * @throws \Lennan\Foiou\Sdk\Core\Exceptions\HttpException
      */
     public function parseJSON($body)
     {
@@ -258,7 +241,7 @@ class Http
      *
      * @return string
      */
-    protected function fuckTheWeChatInvalidJSON($invalidJSON)
+    protected function fuckTheWeChatInvalidJSON($invalidJSON): string
     {
         return preg_replace('/[\x00-\x1F\x80-\x9F]/u', '', trim($invalidJSON));
     }
@@ -268,7 +251,7 @@ class Http
      *
      * @return HandlerStack
      */
-    protected function getHandler()
+    protected function getHandler(): HandlerStack
     {
         $stack = HandlerStack::create();
 

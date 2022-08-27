@@ -18,7 +18,8 @@
         "ext-simplexml": "*",
         "ext-libxml": "*",
         "ext-curl": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "ext-mbstring": "*"
     },
     "autoload": {
         "psr-4": {

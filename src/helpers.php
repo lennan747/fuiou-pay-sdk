@@ -27,23 +27,19 @@ function generate_sign(array $attributes, $key, string $encryptMethod = 'md5'): 
 
 /**
  * @param $publicKey
- * @return resource
- * @throws InvalidArgumentException
+ * @return mixed
  */
 function get_public_key($publicKey)
 {
     $publicKey = "-----BEGIN PUBLIC KEY-----\n" .
         wordwrap($publicKey, 64, "\n", true) .
         "\n-----END PUBLIC KEY-----";
-    $result = openssl_pkey_get_public($publicKey);
-    return $result;
-
+    return openssl_pkey_get_public($publicKey);
 }
 
 /**
  * @param $privateKey
- * @return resource
- * @throws InvalidArgumentException
+ * @return mixed
  */
 function get_private_key($privateKey)
 {

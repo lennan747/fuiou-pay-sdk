@@ -35,12 +35,12 @@ class FuiouTest extends TestCase
         $data['goods_detail']="";
         $data['goods_tag']="";
         $data['txn_begin_ts']=date('YmdHis',time());
-        $order = new Order($data);
+        $order = $data;
 
         $app = new Application($config);
 
         try {
-            $res = $app->aggregate->pay($order);
+            $res = $app->aggregate->prepare($order);
             print_r($res);
         } catch (GuzzleException|InvalidArgumentException $e) {
 //            $file  = 'log.txt';
