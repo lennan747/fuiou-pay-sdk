@@ -1,6 +1,6 @@
 <?php
 
-namespace Lennan\Foiou\Sdk\Exceptions;
+namespace Lennan\Foiou\Sdk\Core\Exceptions;
 
 
 class FuiouPayException extends \Exception

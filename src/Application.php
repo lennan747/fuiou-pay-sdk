@@ -13,7 +13,7 @@ class Application extends Container
      * @var array
      */
     protected $providers = [
-        ServiceProviders\PaymentServiceProvider::class
+        ServiceProviders\AggregateServiceProvider::class
     ];
 
     /**

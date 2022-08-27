@@ -1,6 +1,6 @@
 <?php
 
-namespace Lennan\Fuiou\Sdk;
+namespace Lennan\Fuiou\Sdk\Core;
 
 use Closure;
 

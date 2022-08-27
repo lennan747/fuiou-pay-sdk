@@ -6,7 +6,7 @@ use Lennan\Fuiou\Sdk\Aggregate\Aggregate;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
-class PaymentServiceProvider implements ServiceProviderInterface
+class AggregateServiceProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $pimple
