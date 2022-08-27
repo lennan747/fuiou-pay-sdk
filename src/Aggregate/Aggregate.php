@@ -31,13 +31,15 @@ class Aggregate
     }
 
     /**
-     * @param Order $order
+     * @param array $order
      * @return ResponseInterface
      * @throws GuzzleException
      * @throws InvalidArgumentException
      */
-    public function pay(Order $order)
+    public function pay($order)
     {
+        $order['txn_begin_ts'] = date('YmdHis',time());
+        $order = new Order($order);
         return $this->api->request(self::AGGREGATE, $order->all());
     }
 }

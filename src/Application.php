@@ -3,6 +3,7 @@
 namespace Lennan\Fuiou\Sdk;
 
 use Pimple\Container;
+use Lennan\Fuiou\Sdk\Core\Http;
 
 /**
  * @property \Lennan\Fuiou\Sdk\Aggregate\Aggregate $aggregate
@@ -26,6 +27,8 @@ class Application extends Container
         $this['config'] = new Config($config);
 
         $this->registerProviders();
+
+        Http::setDefaultOptions(['timeout' => 5.0]);
 
         $this->logConfiguration($config);
     }

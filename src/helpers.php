@@ -2,7 +2,6 @@
 
 namespace Lennan\Fuiou\Sdk;
 
-use Lennan\Foiou\Sdk\Core\Exceptions\InvalidArgumentException;
 
 /**
  * Generate a signature.
@@ -37,9 +36,6 @@ function get_public_key($publicKey)
         wordwrap($publicKey, 64, "\n", true) .
         "\n-----END PUBLIC KEY-----";
     $result = openssl_pkey_get_public($publicKey);
-    if (empty($result)) {
-        throw new InvalidArgumentException('public key error');
-    }
     return $result;
 
 }
@@ -55,9 +51,6 @@ function get_private_key($privateKey)
         wordwrap($privateKey, 64, "\n", true) .
         "\n-----END RSA PRIVATE KEY-----";
     $result = openssl_pkey_get_private($privateKey);
-    if (empty($result)) {
-        throw new InvalidArgumentException('private key error');
-    }
     return $result;
 
 }
