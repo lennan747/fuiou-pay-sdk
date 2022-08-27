@@ -1,23 +1,18 @@
 <?php
 
-namespace Lennan\Fuiou\Sdk\Aggregate;
+namespace Lennan\Fuiou\Sdk\Wechat;
 
-use GuzzleHttp\Exception\GuzzleException;
 use Lennan\Fuiou\Sdk\Api;
 use Lennan\Fuiou\Sdk\Config;
 use Lennan\Fuiou\Sdk\Core\Collection;
 use Lennan\Fuiou\Sdk\Core\Exceptions\FuiouPayException;
-use Lennan\Fuiou\Sdk\Core\Exceptions\HttpException;
-use Lennan\Fuiou\Sdk\Core\Exceptions\InvalidArgumentException;
-use Psr\Http\Message\ResponseInterface;
 
-class Aggregate
+class Wechat
 {
-
     /**
      * 聚合支付 统一下单接口
      */
-    const AGGREGATE = '/aggregatePay/preCreate';
+    const AGGREGATE = '/aggregatePay/wxPreCreate';
 
     /**
      * @var Api
@@ -52,7 +47,7 @@ class Aggregate
         $response = new Collection(json_decode($resString, true));
 
         if ($response->get('result_code') !== 000000) {
-            throw new FuiouPayException('[富友支付异常]聚合支付异常：异常代码：' . $response->get('result_code') . ' 异常信息：' . $response->get('result_msg'));
+            throw new FuiouPayException('[富友支付异常]微信支付异常：异常代码：' . $response->get('result_code') . ' 异常信息：' . $response->get('result_msg'));
         }
 
         return $response;

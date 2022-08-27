@@ -2,11 +2,10 @@
 
 namespace Lennan\Fuiou\Sdk;
 
-use Lennan\Foiou\Sdk\Core\Exceptions\FuiouPayException;
-use Lennan\Foiou\Sdk\Core\Exceptions\HttpException;
-use Lennan\Foiou\Sdk\Core\Exceptions\InvalidArgumentException;
+
 use Lennan\Fuiou\Sdk\Aggregate\Order;
 use Lennan\Fuiou\Sdk\Core\Collection;
+use Lennan\Fuiou\Sdk\Core\Exceptions\HttpException;
 use Lennan\Fuiou\Sdk\Core\Http;
 use Lennan\Fuiou\Sdk\Core\XML;
 use Psr\Http\Message\ResponseInterface;

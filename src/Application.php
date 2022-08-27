@@ -7,6 +7,7 @@ use Lennan\Fuiou\Sdk\Core\Http;
 
 /**
  * @property \Lennan\Fuiou\Sdk\Aggregate\Aggregate $aggregate
+ * @property \Lennan\Fuiou\Sdk\Aggregate\Wechat $wechat
  */
 class Application extends Container
 {
@@ -14,7 +15,8 @@ class Application extends Container
      * @var array
      */
     protected $providers = [
-        ServiceProviders\AggregateServiceProvider::class
+        ServiceProviders\AggregateServiceProvider::class,
+        ServiceProviders\WechatServiceProvider::class
     ];
 
     /**
