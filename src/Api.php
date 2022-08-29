@@ -98,9 +98,6 @@ class Api
         // 生成富又需要的BODY格式
         //$body = ['body' => json_encode(['req' => urlencode(urlencode($xml))], JSON_UNESCAPED_UNICODE)];
         $body = ['body' => json_encode($params, JSON_UNESCAPED_UNICODE)];
-        echo $api.PHP_EOL;
-        print_r($body);
-        exit();
         // 合并options
         $options = array_merge($options, $body);
         $response = $this->getHttp()->request($api, $method, $options);
