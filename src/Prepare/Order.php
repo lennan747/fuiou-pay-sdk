@@ -1,6 +1,6 @@
 <?php
 
-namespace Lennan\Fuiou\Sdk\Aggregate;
+namespace Lennan\Fuiou\Sdk\Prepare;
 
 use Lennan\Fuiou\Sdk\Core\Attribute;
 
@@ -20,17 +20,12 @@ class Order extends Attribute
         'order_type',
         'order_amt',
         'mchnt_order_no',
-        'txn_begin_ts',
         'goods_des',
         'goods_detail',
         'goods_tag',
-        'term_id',
-        'term_ip',
+        'txn_begin_ts',
         'addn_inf',
         'curr_type',
-        'reserved_expire_minute',
-        'reserved_user_creid',
-        'reserved_user_truename',
     ];
 
     /**

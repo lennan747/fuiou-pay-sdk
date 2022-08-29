@@ -16,6 +16,7 @@ function generate_sign(array $attributes, $key, string $encryptMethod = 'md5'): 
 {
     ksort($attributes);
 
+    // openssl 签名
     if ($encryptMethod == 'openssl') {
         openssl_sign(http_build_query($attributes), $sign, $key, OPENSSL_ALGO_MD5);
         return base64_encode($sign);
@@ -46,6 +47,7 @@ function get_private_key($privateKey)
     $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" .
         wordwrap($privateKey, 64, "\n", true) .
         "\n-----END RSA PRIVATE KEY-----";
+
     $result = openssl_pkey_get_private($privateKey);
     return $result;
 

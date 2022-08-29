@@ -2,7 +2,7 @@
 
 namespace Lennan\Fuiou\Sdk\Core;
 
-use Lennan\Foiou\Sdk\Core\Exceptions\RuntimeException;
+use Lennan\Fuiou\Sdk\Core\Exceptions\RuntimeException;
 
 class Str
 {

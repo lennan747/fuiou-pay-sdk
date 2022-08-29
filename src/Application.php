@@ -2,12 +2,12 @@
 
 namespace Lennan\Fuiou\Sdk;
 
+use Lennan\Fuiou\Sdk\Prepare\Prepare;
 use Pimple\Container;
 use Lennan\Fuiou\Sdk\Core\Http;
 
 /**
- * @property \Lennan\Fuiou\Sdk\Aggregate\Aggregate $aggregate
- * @property \Lennan\Fuiou\Sdk\Aggregate\Wechat $wechat
+ * @property Prepare $prepare
  */
 class Application extends Container
 {
@@ -15,8 +15,7 @@ class Application extends Container
      * @var array
      */
     protected $providers = [
-        ServiceProviders\AggregateServiceProvider::class,
-        ServiceProviders\WechatServiceProvider::class
+        ServiceProviders\PrepareServiceProvider::class,
     ];
 
     /**
@@ -44,7 +43,7 @@ class Application extends Container
     {
         $config = new Config($config);
 
-        $keys = ['mchnt_cd', 'app_key', 'secret'];
+        $keys = ['mchnt_cd', 'ins_cd', 'private_key', 'environment', 'mchnt_key'];
 
         foreach ($keys as $key) {
             !$config->has($key) || $config[$key] = '***' . substr($config[$key], -5);

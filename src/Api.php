@@ -3,13 +3,11 @@
 namespace Lennan\Fuiou\Sdk;
 
 
-use Lennan\Fuiou\Sdk\Aggregate\Order;
 use Lennan\Fuiou\Sdk\Core\Collection;
 use Lennan\Fuiou\Sdk\Core\Exceptions\HttpException;
 use Lennan\Fuiou\Sdk\Core\Http;
 use Lennan\Fuiou\Sdk\Core\XML;
 use Psr\Http\Message\ResponseInterface;
-use \GuzzleHttp\Client as HttpClient;
 
 
 /**
@@ -26,25 +24,36 @@ class Api
      * 终端号(没有真实终端号统一填88888888)
      */
     const TERM_ID = '88888888';
-    /**
-     * 正式地址
-     */
-    const PRO_API_HOST = 'https://aipay.fuioupay.com';
-
-    /**
-     * 正式地址
-     */
-    const PRO_API_HOST_XS = 'https://aipay-xs.fuioupay.com';
-
-    /**
-     * 测试地址
-     */
-    const DEV_API_HOST = 'https://aipaytest.fuioupay.com';
 
     /**
      * XML头部
      */
     const XML_ROOT = '?xml version="1.0" encoding="GBK" standalone="yes"?';
+
+    /**
+     * 测试环境API地址
+     */
+    const API_HOST_DEV = 'https://aipaytest.fuioupay.com';
+
+    /**
+     * 正式环境API地址
+     */
+    const API_HOST_PRO = 'https://aipay.fuioupay.com';
+
+    /**
+     * 正式环境API地址
+     */
+    const API_HOST_PRO_XS = 'https://aipay-xs.fuioupay.com';
+
+    /**
+     * @var bool
+     */
+    public $debug = false;
+
+    /**
+     * @var string
+     */
+    protected $notifyUrl;
 
 
     /**
@@ -69,7 +78,8 @@ class Api
 
     /**
      * API 请求
-     * @param $api
+     *
+     * @param string $api
      * @param array $params
      * @param string $method
      * @param array $options
@@ -78,56 +88,40 @@ class Api
      * @throws HttpException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function request($api, array $params, string $method = 'post', array $options = [], bool $returnResponse = false)
+    public function request(string $api, array $params, string $method = 'post', array $options = [], bool $returnResponse = false)
     {
-        // 加载配置数据
-        $params = array_merge($params, $this->config->only(['mchnt_cd', 'ins_cd']));
-        // 版本号
-        $params['version'] = self::API_VERSION;
-        // 随机字符串
-        $params['random_str'] = uniqid();
-        // 终端号(没有真实终端号统一填88888888)
-        $params['term_id'] = $params['term_id'] ?? self::TERM_ID;
-        // ip
-        $params['term_ip'] = get_client_ip();
-        // 生成签名
-        $params['sign'] = generate_sign($params, $this->getPrivateKey(), 'openssl');
-        $params = array_filter($params);
         // 生成XML格式
         $xml = XML::build($params, self::XML_ROOT);
         // 生成富又需要的BODY格式
-        $body = ['body' => json_encode(['req' => urldecode(urldecode($xml))], JSON_UNESCAPED_UNICODE)];
-
+        $body = ['body' => json_encode(['req' => urlencode(urlencode($xml))], JSON_UNESCAPED_UNICODE)];
         // 合并options
         $options = array_merge($options, $body);
-        // 请求
-        $response = $this->getHttp()->request($this->wrapApi($api), $method, $options);
-
-        if($response->getStatusCode() !== 200){
-            throw new HttpException('[富友支付异常]请求异常: HTTP状态码 '.$response->getStatusCode());
+        $response = $this->getHttp()->request($api, $method, $options);
+        if ($response->getStatusCode() !== 200) {
+            throw new HttpException('[富友支付异常]请求异常: HTTP状态码 ' . $response->getStatusCode());
         }
-
         return $returnResponse ? $response : $this->parseResponse($response);
     }
 
     /**
-     * @param string $api
-     * @return string
+     * @return array 解除参数
      */
-    public function wrapApi(string $api): string
+    public function baseParams(): array
     {
-        return self::DEV_API_HOST . $api;
+        // 加载配置数据
+        $params = $this->config->only(['mchnt_cd', 'ins_cd']);
+
+        $baseParams = [
+            'version' => self::API_VERSION,  // 版本号
+            'random_str' => uniqid(), // 随机字符串
+            'term_ip' => get_client_ip() // 终端ip
+        ];
+        return array_merge($params, $baseParams);
     }
 
     /**
-     * @return mixed
-     */
-    public function getPrivateKey()
-    {
-        return get_private_key($this->config['secret']);
-    }
-
-    /**
+     * 请求客户端
+     *
      * @return Http
      */
     public function getHttp(): Http
@@ -137,6 +131,22 @@ class Api
         }
 
         return $this->http;
+    }
+
+    /**
+     * 获取API地址
+     *
+     * @param string $api
+     * @param bool $isXs
+     * @return string
+     */
+    public function getApi(string $api, bool $isXs = false): string
+    {
+        if ($this->debug) {
+            return self::API_HOST_DEV . $api;
+        } else {
+            return $isXs ? self::API_HOST_PRO . $api : self::API_HOST_PRO_XS . $api;
+        }
     }
 
     /**

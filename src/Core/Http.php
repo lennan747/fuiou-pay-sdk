@@ -4,8 +4,8 @@ namespace Lennan\Fuiou\Sdk\Core;
 
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\HandlerStack;
+use Lennan\Fuiou\Sdk\Core\Exceptions\HttpException;
 use Psr\Http\Message\ResponseInterface;
-use Lennan\Foiou\Sdk\Core\Exceptions\HttpException;
 
 class Http
 {
@@ -66,14 +66,10 @@ class Http
     }
 
     /**
-     * GET request.
-     *
      * @param string $url
-     * @param array  $options
-     *
+     * @param array $options
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function get(string $url, array $options = []): ResponseInterface
     {
@@ -81,16 +77,12 @@ class Http
     }
 
     /**
-     * POST request.
-     *
-     * @param string       $url
-     * @param array|string $options
-     *
+     * @param $url
+     * @param array $options
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function post($url, $options = []): ResponseInterface
+    public function post($url, array $options = []): ResponseInterface
     {
         $key = is_array($options) ? 'form_params' : 'body';
 
@@ -113,15 +105,12 @@ class Http
     }
 
     /**
-     * Upload file.
-     *
      * @param string $url
      * @param array $files
      * @param array $form
      * @param array $queries
      * @return ResponseInterface
-     *
-     * @throws HttpException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function upload(string $url, array $files = [], array $form = [], array $queries = [])
     {
@@ -209,7 +198,7 @@ class Http
     /**
      * @param $body
      * @return false|mixed
-     * @throws \Lennan\Foiou\Sdk\Core\Exceptions\HttpException
+     * @throws HttpException
      */
     public function parseJSON($body)
     {
@@ -235,10 +224,7 @@ class Http
     }
 
     /**
-     * Filter the invalid JSON string.
-     *
-     * @param \Psr\Http\Message\StreamInterface|string $invalidJSON
-     *
+     * @param $invalidJSON
      * @return string
      */
     protected function fuckTheWeChatInvalidJSON($invalidJSON): string

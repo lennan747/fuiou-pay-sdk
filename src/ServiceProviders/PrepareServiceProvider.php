@@ -2,11 +2,11 @@
 
 namespace Lennan\Fuiou\Sdk\ServiceProviders;
 
-use Lennan\Fuiou\Sdk\Aggregate\Aggregate;
+use Lennan\Fuiou\Sdk\Prepare\Prepare;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
 
-class AggregateServiceProvider implements ServiceProviderInterface
+class PrepareServiceProvider implements ServiceProviderInterface
 {
     /**
      * @param Container $pimple
@@ -14,8 +14,8 @@ class AggregateServiceProvider implements ServiceProviderInterface
      */
     public function register(Container $pimple)
     {
-        $pimple['aggregate'] = function ($pimple) {
-            return new Aggregate($pimple['config']);
+        $pimple['prepare'] = function ($pimple) {
+            return new Prepare($pimple['config']);
         };
     }
 }

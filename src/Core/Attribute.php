@@ -2,7 +2,7 @@
 
 namespace Lennan\Fuiou\Sdk\Core;
 
-use Lennan\Foiou\Sdk\Core\Exceptions\InvalidArgumentException;
+use Lennan\Fuiou\Sdk\Core\Exceptions\InvalidArgumentException;
 
 abstract class Attribute extends Collection
 {
