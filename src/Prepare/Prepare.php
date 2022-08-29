@@ -7,7 +7,8 @@ use Lennan\Fuiou\Sdk\Core\Collection;
 use Lennan\Fuiou\Sdk\Core\Exceptions\FuiouPayException;
 use Lennan\Fuiou\Sdk\Core\Exceptions\HttpException;
 use Lennan\Fuiou\Sdk\Core\Exceptions\InvalidArgumentException;
-use Lennan\Fuiou\Sdk\Unity\Order;
+use Lennan\Fuiou\Sdk\Prepare\Order;
+use function Lennan\Fuiou\Sdk\get_client_ip;
 
 class Prepare extends Api
 {
@@ -22,55 +23,21 @@ class Prepare extends Api
     const WECHAT_API = '/aggregatePay/wxPreCreate';
 
     /**
-     * 统一下单
-     * 富友开放接口文档： 自2019年7月23日开始，微信新增商户不再具有主扫下单权限
-     *
-     * @param Order $order
-     * @param string $tradeType
+     * @param \Lennan\Fuiou\Sdk\Prepare\Order $order
+     * @param string $orderType
+     * @param $tradeType
      * @return Collection
      * @throws FuiouPayException
      * @throws HttpException
      * @throws InvalidArgumentException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function unity(Order $order, string $tradeType)
+    public function pay(Order $order, string $orderType, $tradeType = null): Collection
     {
-        $params = $this->getParams($order, $tradeType);
-        $api = $this->getApi(self::UNITY_API);
-        return $this->prepare($api, $params);
-    }
+        $api = $orderType == 'WECHAT' && !empty($tradeType) ? $this->getApi(self::WECHAT_API) : $this->getApi(self::UNITY_API);
+        $params = $this->getParams($order->all(), $orderType, $tradeType);
+        $options = ['headers' => ['Content-Type' => 'application/json']];
 
-    /**
-     * @param Order $order
-     * @param string $tradeType
-     * @return Collection
-     * @throws FuiouPayException
-     * @throws HttpException
-     * @throws InvalidArgumentException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function wechat(Order $order, string $tradeType)
-    {
-        $params = $this->getParams($order->all(), $tradeType);
-        $api = $this->getApi(self::WECHAT_API);
-        return $this->prepare($api, $params);
-    }
-
-    /**
-     * @param string $api
-     * @param array $params
-     * @return Collection
-     * @throws FuiouPayException
-     * @throws HttpException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    public function prepare(string $api, array $params): Collection
-    {
-        $options = [
-            'headers' => [
-                ''
-            ]
-        ];
         $response = $this->request($api, $params, 'POST', $options, true);
         $resString = $response->getBody()->getContents();
         $response = new Collection(json_decode($resString, true));
@@ -83,15 +50,31 @@ class Prepare extends Api
     /**
      * 生成请求参数
      *
-     * @param $params
-     * @param $tradeType
+     * @param array $params
+     * @param string $orderType
+     * @param string|null $tradeType
      * @return array
      * @throws InvalidArgumentException
      */
-    public function getParams($params, $tradeType)
+    public function getParams(array $params, string $orderType, string $tradeType = null)
     {
-        $params = array_merge($params, ['trade_type' => $tradeType, 'notify_url' => $this->notifyUrl]);
-        $params['sign'] = $this->generateSign($params);
+        // 签名前处理
+        if (isset($params['order_type'])) unset($params['order_type']);
+        if (isset($params['trade_type'])) unset($params['trade_type']);
+        // 终端号
+        if (!isset($params['term_id']) || empty($params['term_id'])) $params['term_id'] = self::TERM_ID;
+        if (!isset($params['term_ip']) || empty($params['term_ip'])) $params['term_ip'] = get_client_ip();
+        // 下单时间
+        if (!isset($params['txn_begin_ts']) || empty($params['txn_begin_ts'])) $params['txn_begin_ts'] = date('YmdHis', time());
+
+        // 签名参数
+        $type = $orderType == 'WECHAT' && !empty($tradeType) ? $tradeType : $orderType;
+        $params = array_merge($params, $this->baseParams(), ['notify_url' => $this->config->get('notify_url')]);
+        $params['sign'] = $this->generateSign($params, $type);
+
+        // 请求参数
+        $orderType == 'WECHAT' && !empty($tradeType) ? $params['trade_type'] = $tradeType : $params['order_type'] = $orderType;
+
         return $params;
     }
 
@@ -102,10 +85,11 @@ class Prepare extends Api
      * @return string
      * @throws InvalidArgumentException
      */
-    public function generateSign(array $params)
+    public function generateSign(array $params, string $type)
     {
+        $params['type'] = $type;
         $signArray = [
-            'mchnt_cd', 'order_type', 'order_amt', 'mchnt_order_no', 'txn_begin_ts', 'goods_des', 'term_id',
+            'mchnt_cd', 'type', 'order_amt', 'mchnt_order_no', 'txn_begin_ts', 'goods_des', 'term_id',
             'term_ip', 'notify_url', 'random_str', 'version', 'mchnt_key'
         ];
 
@@ -118,5 +102,17 @@ class Prepare extends Api
         }
 
         return md5(implode('|', $signArray));
+    }
+
+    /**
+     * @param array $params
+     * @return bool
+     */
+    public function checkSign(array $params)
+    {
+        $sign = $params['full_sign'];
+        unset($params['full_sign'], $params['sign']);
+        $params['mchnt_key'] = $this->config->get('mchnt_key');
+        return md5(implode('|', $params)) === $sign;
     }
 }

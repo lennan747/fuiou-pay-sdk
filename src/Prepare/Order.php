@@ -17,7 +17,6 @@ class Order extends Attribute
 {
 
     protected $attributes = [
-        'order_type',
         'order_amt',
         'mchnt_order_no',
         'goods_des',

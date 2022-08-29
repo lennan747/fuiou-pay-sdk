@@ -73,6 +73,9 @@ class Api
      */
     public function __construct(Config $config)
     {
+        if ($config->get('environment') === 'dev') {
+            $this->debug = true;
+        }
         $this->config = $config;
     }
 
@@ -91,9 +94,13 @@ class Api
     public function request(string $api, array $params, string $method = 'post', array $options = [], bool $returnResponse = false)
     {
         // 生成XML格式
-        $xml = XML::build($params, self::XML_ROOT);
+//        $xml = XML::build($params, self::XML_ROOT);
         // 生成富又需要的BODY格式
-        $body = ['body' => json_encode(['req' => urlencode(urlencode($xml))], JSON_UNESCAPED_UNICODE)];
+        //$body = ['body' => json_encode(['req' => urlencode(urlencode($xml))], JSON_UNESCAPED_UNICODE)];
+        $body = ['body' => json_encode($params, JSON_UNESCAPED_UNICODE)];
+        echo $api.PHP_EOL;
+        print_r($body);
+        exit();
         // 合并options
         $options = array_merge($options, $body);
         $response = $this->getHttp()->request($api, $method, $options);
@@ -109,14 +116,10 @@ class Api
     public function baseParams(): array
     {
         // 加载配置数据
-        $params = $this->config->only(['mchnt_cd', 'ins_cd']);
-
-        $baseParams = [
-            'version' => self::API_VERSION,  // 版本号
-            'random_str' => uniqid(), // 随机字符串
-            'term_ip' => get_client_ip() // 终端ip
-        ];
-        return array_merge($params, $baseParams);
+        return array_merge(
+            $this->config->only(['mchnt_cd', 'ins_cd', 'mchnt_key']),
+            ['version' => self::API_VERSION, 'random_str' => uniqid()]
+        );
     }
 
     /**

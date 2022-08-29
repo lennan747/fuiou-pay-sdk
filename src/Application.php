@@ -2,12 +2,11 @@
 
 namespace Lennan\Fuiou\Sdk;
 
-use Lennan\Fuiou\Sdk\Prepare\Prepare;
 use Pimple\Container;
 use Lennan\Fuiou\Sdk\Core\Http;
 
 /**
- * @property Prepare $prepare
+ * @property Lennan\Fuiou\Sdk\Prepare\Prepare $prepare
  */
 class Application extends Container
 {
