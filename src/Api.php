@@ -94,9 +94,8 @@ class Api
     public function request(string $api, array $params, string $method = 'post', array $options = [], bool $returnResponse = false)
     {
         // 生成XML格式
-//        $xml = XML::build($params, self::XML_ROOT);
+        // $xml = XML::build($params, self::XML_ROOT);
         // 生成富又需要的BODY格式
-        //$body = ['body' => json_encode(['req' => urlencode(urlencode($xml))], JSON_UNESCAPED_UNICODE)];
         $body = ['body' => json_encode($params, JSON_UNESCAPED_UNICODE)];
         // 合并options
         $options = array_merge($options, $body);

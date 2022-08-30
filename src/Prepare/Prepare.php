@@ -37,12 +37,11 @@ class Prepare extends Api
         $api = $orderType == 'WECHAT' && !empty($tradeType) ? $this->getApi(self::WECHAT_API) : $this->getApi(self::UNITY_API);
         $params = $this->getParams($order->all(), $orderType, $tradeType);
         $options = ['headers' => ['Content-Type' => 'application/json']];
-
         $response = $this->request($api, $params, 'POST', $options, true);
         $resString = $response->getBody()->getContents();
         $response = new Collection(json_decode($resString, true));
         if ($response->get('result_code') != 000000) {
-            throw new FuiouPayException('[富友支付异常]聚合支付异常：异常代码：' . $response->get('result_code') . ' 异常信息：' . $response->get('result_msg'));
+            throw new FuiouPayException('[富友支付异常]异常代码：' . $response->get('result_code') . ' 异常信息：' . $response->get('result_msg'));
         }
         return $response;
     }
@@ -82,6 +81,7 @@ class Prepare extends Api
 
         // 请求参数
         $orderType == 'WECHAT' && !empty($tradeType) ? $params['trade_type'] = $tradeType : $params['order_type'] = $orderType;
+        if ($orderType == 'WECHAT' && !empty($tradeType)) $params['sub_appid'] = $this->config->get('wechat_appid');
         if (isset($openid)) $params['openid'] = $openid;
         if (isset($subOpenid)) $params['sub_openid'] = $subOpenid;
 
