@@ -41,7 +41,7 @@ class Prepare extends Api
         $response = $this->request($api, $params, 'POST', $options, true);
         $resString = $response->getBody()->getContents();
         $response = new Collection(json_decode($resString, true));
-        if ($response->get('result_code') !== 000000) {
+        if ($response->get('result_code') != 000000) {
             throw new FuiouPayException('[富友支付异常]聚合支付异常：异常代码：' . $response->get('result_code') . ' 异常信息：' . $response->get('result_msg'));
         }
         return $response;
@@ -58,6 +58,14 @@ class Prepare extends Api
      */
     public function getParams(array $params, string $orderType, string $tradeType = null)
     {
+        if (isset($params['openid'])) {
+            $openid = $params['openid'];
+            unset($params['openid']);
+        }
+        if (isset($params['sub_openid'])) {
+            $subOpenid = $params['sub_openid'];
+            unset($params['sub_openid']);
+        }
         // 签名前处理
         if (isset($params['order_type'])) unset($params['order_type']);
         if (isset($params['trade_type'])) unset($params['trade_type']);
@@ -74,6 +82,8 @@ class Prepare extends Api
 
         // 请求参数
         $orderType == 'WECHAT' && !empty($tradeType) ? $params['trade_type'] = $tradeType : $params['order_type'] = $orderType;
+        if (isset($openid)) $params['openid'] = $openid;
+        if (isset($subOpenid)) $params['sub_openid'] = $subOpenid;
 
         return $params;
     }

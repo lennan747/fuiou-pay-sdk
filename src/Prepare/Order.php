@@ -25,6 +25,8 @@ class Order extends Attribute
         'txn_begin_ts',
         'addn_inf',
         'curr_type',
+        'openid',
+        'sub_openid'
     ];
 
     /**

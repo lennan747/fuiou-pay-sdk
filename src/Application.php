@@ -6,7 +6,7 @@ use Pimple\Container;
 use Lennan\Fuiou\Sdk\Core\Http;
 
 /**
- * @property Lennan\Fuiou\Sdk\Prepare\Prepare $prepare
+ * @property \Lennan\Fuiou\Sdk\Prepare\Prepare $prepare
  */
 class Application extends Container
 {
